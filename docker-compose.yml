@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mapmemoryserver
+      MYSQL_USER: apiuser
+      MYSQL_PASSWORD: apipassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  webapi:
+    build: .
+    depends_on:
+      - mysql-db
+    ports:
+      - "5000:80"
+    environment:
+      ConnectionStrings__DefaultConnection: "server=mysql-db;port=3306;database=mapmemoryserver;user=apiuser;password=apipassword;"
+
+volumes:
+  db_data:

@@ -51,7 +51,7 @@ A API se conecta a um banco de dados MySQL. As credenciais padrão são:
 
 - Nome do banco de dados: `mapmemorydb`;
 - Usuário: `apiuser`;
-- Senha: `apipassoword`.
+- Senha: `apipassword`.
 
 Para mudar as configurações do banco de dados, atualize o arquivo `docker-compose.yml`.
 
