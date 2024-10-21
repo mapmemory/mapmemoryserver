@@ -14,7 +14,7 @@ namespace Services;
 public class AuthService
 {
     private static SymmetricSecurityKey? securityKey;
-    private static readonly string secret = "oepsko34okfso23ooj3pqo3pj21321";
+    private static readonly string secret = "oepsko34okfso23ooj3pqo3pj21321423423423412vcvcxvvcasd123332sfdvxx";
     private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
 
     public AuthService()
