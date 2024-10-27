@@ -34,7 +34,7 @@ public class UploadController : ControllerBase
             // _context.Images.Add(new Image { FilePath = filePath });
             // await _context.SaveChangesAsync();
 
-            return Ok("Image uploaded successfully");
+            return Ok(fileName);
         }
 
         return BadRequest("No file selected");
