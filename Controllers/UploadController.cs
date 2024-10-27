@@ -39,4 +39,28 @@ public class UploadController : ControllerBase
 
         return BadRequest("No file selected");
     }
+
+    [HttpPost("uploadPictures")]
+    public async Task<IActionResult> uploadPictures(IFormFile[] files)
+    {
+        if (files.Length == 0)
+        {
+            return BadRequest("No files selected");
+        }
+
+        var fileGuid = Guid.NewGuid().ToString();
+
+        for (int i = 0; i < files.Length; i++)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileGuid +"-"+ (i+1) + Path.GetExtension(files[i].FileName));
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await files[i].CopyToAsync(stream);
+            }
+        }
+
+        return Ok(new { fileGuid });
+    }
+
+    
 }
