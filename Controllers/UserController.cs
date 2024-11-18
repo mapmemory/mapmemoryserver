@@ -40,19 +40,26 @@ public class UserController : ControllerBase
         public string? email { get; set; }
         public string? oldPassword { get; set; }
         public string? newPassword { get; set; }
+        public string? name { get; set; }
+        public CLasses cLass { get; set; }
     }
+
     [HttpPut("{uuid}/change")]
     public async Task<IActionResult> UpdateUser(Guid uuid, [FromBody] updateRequest request)
     {
-        var foundUser = await _context.User.FindAsync(uuid);
+        Console.WriteLine($"Received Request: {request}");
+        Console.WriteLine($"UUID: {uuid}");
+
+        var foundUser = await _context.User.FirstOrDefaultAsync(u => u.Guid == uuid);
         if (foundUser == null)
         {
-            return NotFound();
+            return NotFound("User not found.");
         }
 
-        if (!string.IsNullOrEmpty(request.oldPassword) && !AuthService.VerifyPassword(request.oldPassword, foundUser.Password))
+        if (!string.IsNullOrEmpty(request.oldPassword) && 
+            !AuthService.VerifyPassword(request.oldPassword, foundUser.Password))
         {
-            return BadRequest("Invalid old password");
+            return BadRequest("Invalid old password.");
         }
 
         if (!string.IsNullOrEmpty(request.newPassword))
@@ -65,6 +72,13 @@ public class UserController : ControllerBase
             foundUser.Email = request.email;
         }
 
+        if (!string.IsNullOrEmpty(request.name))
+        {
+            foundUser.Name = request.name;
+        }
+
+        foundUser.Class = request.cLass;
+
         _context.Entry(foundUser).State = EntityState.Modified;
 
         try
@@ -73,26 +87,32 @@ public class UserController : ControllerBase
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!UserExists(uuid))
+            if (!await UserExistsAsync(uuid))
             {
-                return NotFound();
+                return NotFound("User not found during save.");
             }
-            else
-            {
-                throw;
-            }
+            throw;
         }
 
         return NoContent();
     }
 
+
     [HttpDelete("{uuid}")]
     public async Task<IActionResult> DeleteUser(Guid uuid)
     {
-        var user = await _context.User.FindAsync(uuid);
+        var user = await _context.User
+            .Include(u => u.MapSpots)
+            .FirstOrDefaultAsync(u => u.Guid == uuid);
+
         if (user == null)
         {
             return NotFound();
+        }
+
+        if (user.MapSpots != null && user.MapSpots.Any())
+        {
+            _context.MapSpot.RemoveRange(user.MapSpots);
         }
 
         _context.User.Remove(user);
@@ -100,6 +120,7 @@ public class UserController : ControllerBase
 
         return NoContent();
     }
+
 
     
     [HttpPost("login")]
@@ -134,7 +155,8 @@ public class UserController : ControllerBase
         {
             Name = user.Name,
             Email = user.Email,
-            Password = AuthService.HashPassword(user.Password)
+            Password = AuthService.HashPassword(user.Password),
+            Class = user.Class
         };
 
         _context.User.Add(newUser);
@@ -150,4 +172,15 @@ public class UserController : ControllerBase
     {
         return _context.User.Any(e => e.Guid == uuid);
     }
+
+    private bool UserExistsWithId(int id)
+    {
+        return _context.User.Any(e => e.Id == id);
+    }
+
+    private async Task<bool> UserExistsAsync(Guid uuid)
+    {
+        return await _context.User.AnyAsync(u => u.Guid == uuid);
+    }
+
 }
