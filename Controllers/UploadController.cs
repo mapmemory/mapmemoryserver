@@ -62,5 +62,8 @@ public class UploadController : ControllerBase
         return Ok(new { fileGuid });
     }
 
-    
+    // TODO:
+
+    // Rota delete para remover 1 ou mais arquivos, a depender do tipo de memória,
+    // Rota update para remover 1 ou mais arquivos, e após realizar upload de novos arquivos de modo do usuário requisitá-los.
 }

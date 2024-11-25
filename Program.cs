@@ -18,7 +18,7 @@ builder.Services.AddDbContext<ApplicationContext>(options => options.UseMySql(co
 builder.Services.AddCors(options =>{
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
+        builder.WithOrigins("http://localhost:3000", "http://localhost:3001") // Precisa add os domínios de host para funcionar corretamente em ambiente de produção
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
